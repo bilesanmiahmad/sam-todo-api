@@ -1,0 +1,80 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  todo_list_api
+
+  Sample SAM Template for todo_list_api
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+
+    Tracing: Active
+  Api:
+    TracingEnabled: true
+Resources:
+  CreateTodoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/create_todo/
+      Handler: app.create
+      Runtime: python3.9
+      Events:
+        CreateTodo:
+          Type: Api
+          Properties:
+            Path: /todos
+            Method: post
+      Policies: 
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TodosTable
+  ListTodoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/list_todo/
+      Handler: app.list
+      Runtime: python3.9
+      Events:
+        CreateTodo:
+          Type: Api
+          Properties:
+            Path: /todos
+            Method: get
+      Policies: 
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TodosTable
+  UpdateTodoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/update_todo/
+      Handler: app.update
+      Runtime: python3.9
+      Events:
+        CreateTodo:
+          Type: Api
+          Properties:
+            Path: /todos/{id}
+            Method: put
+      Policies: 
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TodosTable
+  TodosTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: "Todos"
+      AttributeDefinitions:
+        - AttributeName: "id"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "id"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+  
+Outputs:
+  TodoApi:
+    Description: "API Gateway Todo endpoint"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
