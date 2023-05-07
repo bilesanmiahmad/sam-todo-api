@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 
 def delete(message, context):
-    if ('body' not in message or message['httpMethod'] != 'PUT'):
+    if ('pathParameters' not in message or message['httpMethod'] != 'DELETE'):
         return {
             'statusCode': 400,
             'headers': {},
@@ -22,20 +22,13 @@ def delete(message, context):
         'id': todo_id
     }
     
-    response = table.update_item(
-        Key=params,
-        UpdateExpression="set title = :s, description = :s, isDone = :s",
-        ExpressionAttributeValues={
-            ":s": activity['title'],
-            ":s": activity['description'],
-            ":s": activity['isDone']
-        },
-        ReturnValues="UPDATED_NEW"
+    response = table.delete_item(
+        Key=params
     )
     print(response)
 
     return {
         'statusCode': 200,
         'headers': {},
-        'body': json.dumps({'msg': 'Todo Updated'})
+        'body': json.dumps({'msg': 'Todo Deleted'})
     }

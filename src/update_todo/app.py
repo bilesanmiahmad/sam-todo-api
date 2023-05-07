@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 
 def update(message, context):
-    if ('body' not in message or message['httpMethod'] != 'PUT'):
+    if ('pathParameters' not in message or message['httpMethod'] != 'PUT'):
         return {
             'statusCode': 400,
             'headers': {},

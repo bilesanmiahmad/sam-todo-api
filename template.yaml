@@ -60,6 +60,21 @@ Resources:
       Policies: 
         - DynamoDBCrudPolicy:
             TableName: !Ref TodosTable
+  DeleteTodoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/delete_todo/
+      Handler: app.delete
+      Runtime: python3.9
+      Events:
+        CreateTodo:
+          Type: Api
+          Properties:
+            Path: /todos/{id}
+            Method: delete
+      Policies: 
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TodosTable
   TodosTable:
     Type: AWS::DynamoDB::Table
     Properties:
